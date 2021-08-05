@@ -112,6 +112,7 @@ pub struct MicroBit {
 
     scheduler: &'static RoundRobinSched<'static>,
     systick: cortexm4::systick::SysTick,
+    hello:&'static drivers::hello::Hello
 }
 
 impl SyscallDriverLookup for MicroBit {
@@ -135,6 +136,7 @@ impl SyscallDriverLookup for MicroBit {
             capsules::app_flash_driver::DRIVER_NUM => f(Some(self.app_flash)),
             capsules::sound_pressure::DRIVER_NUM => f(Some(self.sound_pressure)),
             kernel::ipc::DRIVER_NUM => f(Some(&self.ipc)),
+            drivers::hello::DRIVER_NUM => f(Some(self.hello)),
             _ => f(None),
         }
     }
@@ -578,6 +580,9 @@ pub unsafe fn main() {
 
     let scheduler = components::sched::round_robin::RoundRobinComponent::new(&PROCESSES)
         .finalize(components::rr_component_helper!(NUM_PROCS));
+        
+    //private drivers
+    let hello = static_init!(drivers::hello::Hello, drivers::hello::Hello::new());    
 
     let microbit = MicroBit {
         ble_radio,
@@ -602,6 +607,7 @@ pub unsafe fn main() {
 
         scheduler,
         systick: cortexm4::systick::SysTick::new_with_calibration(64000000),
+        hello:hello
     };
 
     let chip = static_init!(
