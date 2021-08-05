@@ -3,7 +3,7 @@ use kernell::process::{Error,Processid}
 use kernel::syscall::{CommandReturn,SyscallDriver}
 use kernell::ErrorCode;
 
-pub const DRIVER_NUM: usize = 0xa0001;
+pub const HELLO_DRIVER_NUM: usize = 0xa0001;
 
 const DIGITS:[ur32;10]= [
 	0b11111_10011_10101_11001,
@@ -24,7 +24,6 @@ impl<'a, L:Led> DotsDisplay<'a, L>{
 	pub fn new(leds: &'a [&'a L;25]) -> DotsDisplay<'a,L>{
 	DotsDisplay{leds}
 	}
-}
 
 	fn display (&self,digit:char){
 		let digit_index = digit as usize - '0' as usize;let current_digit = DIGITS[digit_index];
@@ -38,3 +37,37 @@ impl<'a, L:Led> DotsDisplay<'a, L>{
 			}
 		}
 	}
+}
+
+
+imp<'a, L: Led> SyscallDriver for DotsDisplay<'a,L> {
+	fn command(
+		&self,
+		command_num: usize,
+		r2: usize,
+		_r3: usize,
+		_process_id: ProcessId,
+	)
+	-> CommandReturn{
+		match command_num {
+			0 => CommandReturn::success(),
+
+			1 => match char::from_u32(r2 as u32){
+				Some(digit) => {
+					if digit >= '0' && digit <= '9'{
+						self.display(digit);
+						CommandReturn::success()
+					}else{
+						CommandReturn::failure(ErrorCode::INVAL)
+					}
+				}
+				None => CommandReturn::failure(ErrorCode::INVAL),
+			}
+			_ => CommandReturn::failure(ErrorCode::NOSUPPORT)
+		}
+	}
+
+	fn allocate_grant(&self, _process_id:ProcessId) -> Result<(),Error>{
+		Ok(())
+	}
+}

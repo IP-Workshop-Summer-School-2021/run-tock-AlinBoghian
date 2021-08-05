@@ -2,7 +2,7 @@ use kernel::syscall::{SyscallDriver,CommandReturn};
 use kernel::process::{Error,ProcessId};
 use kernel::{ErrorCode,debug};
 use core::cell::Cell;
-pub const DRIVER_NUM: usize =0xa0000;
+pub const HELLO_DRIVER_NUM: usize =0xa0000;
 
 pub struct Hello{
 	n:Cell<u32>,
