@@ -2,7 +2,7 @@ use kernel::syscall::{SyscallDriver,CommandReturn};
 use kernel::process::{Error,ProcessId};
 use kernel::{ErrorCode,debug};
 use core::cell::Cell;
-pub const HELLO_DRIVER_NUM: usize =0xa0000;
+pub const DRIVER_NUM: usize =0xa0000;
 
 pub struct Hello{
 	n:Cell<u32>,
@@ -39,7 +39,7 @@ impl SyscallDriver for Hello{
         			CommandReturn::success()
         		}
         		3=>{
-        			if(self.n.get() >0){
+        			if self.n.get() >0{
         				self.n.set(self.n.get()-1);
         				CommandReturn::success()
         			}else{

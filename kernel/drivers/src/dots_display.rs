@@ -1,11 +1,11 @@
 use kernel::hil::led::Led;
-use kernell::process::{Error,Processid}
-use kernel::syscall::{CommandReturn,SyscallDriver}
-use kernell::ErrorCode;
+use kernel::process::{Error,ProcessId};
+use kernel::syscall::{CommandReturn,SyscallDriver};
+use kernel::ErrorCode;
 
-pub const HELLO_DRIVER_NUM: usize = 0xa0001;
+pub const DRIVER_NUM: usize = 0xa0001;
 
-const DIGITS:[ur32;10]= [
+const DIGITS:[u32;10]= [
 	0b11111_10011_10101_11001,
 	0b11111_10011_10101_11001,
 	0b11111_10011_10101_11001,
@@ -14,7 +14,9 @@ const DIGITS:[ur32;10]= [
 	0b11111_10011_10101_11001,
 	0b11111_10011_10101_11001,
 	0b11111_10011_10101_11001,
-]
+	0b11111_10011_10101_11001,
+	0b11111_10011_10101_11001,
+];
 
 pub struct DotsDisplay<'a, L:Led> {
 	leds: &'a [&'a L;25],
@@ -28,7 +30,7 @@ impl<'a, L:Led> DotsDisplay<'a, L>{
 	fn display (&self,digit:char){
 		let digit_index = digit as usize - '0' as usize;let current_digit = DIGITS[digit_index];
 		for index in 0..25{
-			let bit == (current_digit>> (24-index)) & 0x1;
+			let bit = (current_digit>> (24-index)) & 0x1;
 			if bit == 1 {
 				self.leds[index].on();
 			}
@@ -40,7 +42,7 @@ impl<'a, L:Led> DotsDisplay<'a, L>{
 }
 
 
-imp<'a, L: Led> SyscallDriver for DotsDisplay<'a,L> {
+impl<'a, L: Led> SyscallDriver for DotsDisplay<'a,L> {
 	fn command(
 		&self,
 		command_num: usize,
